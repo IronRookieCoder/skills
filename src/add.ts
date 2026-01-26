@@ -446,8 +446,8 @@ async function handleRemoteSkill(
   console.log();
   p.outro(chalk.green('Done!'));
 
-  // TODO: Prompt for find-skills after successful install (uncomment when ready)
-  // await promptForFindSkills();
+  // Prompt for find-skills after successful install
+  await promptForFindSkills();
 }
 
 /**
@@ -759,8 +759,8 @@ async function handleDirectUrlSkillLegacy(
   console.log();
   p.outro(chalk.green('Done!'));
 
-  // TODO: Prompt for find-skills after successful install (uncomment when ready)
-  // await promptForFindSkills();
+  // Prompt for find-skills after successful install
+  await promptForFindSkills();
 }
 
 export async function runAdd(args: string[], options: AddOptions = {}): Promise<void> {
@@ -1284,8 +1284,8 @@ export async function runAdd(args: string[], options: AddOptions = {}): Promise<
     console.log();
     p.outro(chalk.green('Done!'));
 
-    // TODO: Prompt for find-skills after successful install (uncomment when ready)
-    // await promptForFindSkills();
+    // Prompt for find-skills after successful install
+    await promptForFindSkills();
   } catch (error) {
     if (error instanceof GitCloneError) {
       p.log.error(chalk.red('Failed to clone repository'));
@@ -1338,6 +1338,7 @@ async function promptForFindSkills(): Promise<void> {
     }
 
     console.log();
+    p.log.message(chalk.dim("One-time prompt - you won't be asked again if you dismiss."));
     const install = await p.confirm({
       message: `Install the ${chalk.cyan('find-skills')} skill? It helps your agent discover and suggest skills.`,
     });
@@ -1349,22 +1350,21 @@ async function promptForFindSkills(): Promise<void> {
 
     if (install) {
       // Install find-skills globally to all agents
+      // Mark as dismissed first to prevent recursive prompts
+      await dismissPrompt('findSkillsPrompt');
+
       console.log();
       p.log.step('Installing find-skills skill...');
 
-      // Run installation via the CLI (using the bundled skill in this repo)
-      const { spawnSync } = await import('child_process');
-      const result = spawnSync(
-        'npx',
-        ['-y', 'skills', 'add', 'vercel-labs/skills@find-skills', '-g', '-y', '--all'],
-        {
-          stdio: 'inherit',
-        }
-      );
-
-      if (result.status === 0) {
-        p.log.success('find-skills installed! Your agent can now help you discover skills.');
-      } else {
+      try {
+        // Call runAdd directly instead of spawning subprocess
+        await runAdd(['vercel-labs/skills'], {
+          skill: ['find-skills'],
+          global: true,
+          yes: true,
+          all: true,
+        });
+      } catch {
         p.log.warn('Failed to install find-skills. You can try again with:');
         p.log.message(chalk.dim('  npx skills add vercel-labs/skills@find-skills -g -y --all'));
       }
