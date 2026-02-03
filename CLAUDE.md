@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-`skills` 是开放代理技能生态系统的 CLI 工具，用于安装、管理和发现可扩展 AI 编码代理能力的可复用指令集（技能）。
+`@sangfor/skills` 是开放代理技能生态系统的 CLI 工具和库，用于安装、管理和发现可扩展 AI 编码代理能力的可复用指令集（技能）。
+
+本项目已改造为可导入的库，支持：
+- CLI 工具：`npx skills add ...`
+- 库导入：`import { parseSource, installSkillForAgent } from '@sangfor/skills'`
 
 ## 常用命令
 
@@ -42,7 +46,8 @@ pnpm format:check
 
 ```
 src/
-├── cli.ts           # 主入口，命令路由，init/check/update/generate-lock
+├── index.ts         # 库导出入口（新增）
+├── cli.ts           # CLI 主入口，命令路由
 ├── add.ts           # add 命令核心逻辑
 ├── list.ts          # 列出已安装技能
 ├── remove.ts        # 移除已安装技能
@@ -64,6 +69,30 @@ src/
 └── *.test.ts        # 同目录测试文件
 
 tests/               # 额外测试文件
+```
+
+## 库导出
+
+`src/index.ts` 导出以下模块供外部使用：
+
+```typescript
+// 核心安装
+installSkillForAgent, listInstalledSkills, sanitizeName, ...
+
+// 技能发现
+discoverSkills, parseSkillMd, filterSkills, ...
+
+// 源解析
+parseSource, getOwnerRepo, cloneRepo, cleanupTempDir, ...
+
+// 代理配置
+agents, getAgentConfig, detectInstalledAgents
+
+// 锁文件管理
+readSkillLock, writeSkillLock, addSkillToLock, ...
+
+// 类型
+AgentType, Skill, AgentConfig, ParsedSource, ...
 ```
 
 ## 核心概念

@@ -420,6 +420,58 @@ This CLI collects anonymous usage data to help improve the tool. No personal inf
 
 Telemetry is automatically disabled in CI environments.
 
+## Using as a Library
+
+This package can also be used as a library to build custom CLI tools:
+
+```typescript
+import {
+  parseSource,
+  cloneRepo,
+  cleanupTempDir,
+  discoverSkills,
+  installSkillForAgent,
+  agents,
+  detectInstalledAgents,
+  addSkillToLock,
+  getOwnerRepo,
+  type AgentType,
+  type Skill,
+} from '@sangfor/skills';
+
+// Parse a source
+const parsed = parseSource('vercel-labs/agent-skills');
+
+// Clone the repository
+const localPath = await cloneRepo(parsed.url, parsed.ref);
+
+// Discover skills
+const skills = await discoverSkills(localPath, parsed.subpath);
+
+// Install to agents
+for (const skill of skills) {
+  const result = await installSkillForAgent(skill, 'claude-code', {
+    global: true,
+  });
+  console.log(result.success ? '✓' : '✗', skill.name);
+}
+
+// Cleanup
+await cleanupTempDir(localPath);
+```
+
+### Exports
+
+| Category | Exports |
+|----------|---------|
+| **Installer** | `installSkillForAgent`, `listInstalledSkills`, `sanitizeName`, `getCanonicalSkillsDir` |
+| **Skills** | `discoverSkills`, `parseSkillMd`, `filterSkills`, `getSkillDisplayName` |
+| **Source Parser** | `parseSource`, `getOwnerRepo`, `parseOwnerRepo`, `isRepoPrivate` |
+| **Git** | `cloneRepo`, `cleanupTempDir`, `GitCloneError` |
+| **Agents** | `agents`, `getAgentConfig`, `detectInstalledAgents` |
+| **Lock File** | `readSkillLock`, `writeSkillLock`, `addSkillToLock`, `removeSkillFromLock` |
+| **Types** | `AgentType`, `Skill`, `AgentConfig`, `ParsedSource`, `SkillLockEntry` |
+
 ## Related Links
 
 - [Agent Skills Specification](https://agentskills.io)
