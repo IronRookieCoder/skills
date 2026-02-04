@@ -88,3 +88,30 @@ export type {
 // Constants
 // -----------------------------------------------------------------------------
 export { AGENTS_DIR, SKILLS_SUBDIR } from './constants.js';
+
+// -----------------------------------------------------------------------------
+// Configuration - User configuration management
+// -----------------------------------------------------------------------------
+export {
+  loadConfig,
+  loadConfigSync,
+  saveConfig,
+  updateConfig,
+  getConfigPath,
+  getConfigDir,
+  isTelemetryEnabled,
+  isTelemetryEnabledSync,
+  getPlatformUrl,
+  getDefaultAgents,
+  setDefaultAgents,
+  getDefaultConfig,
+  ENV_VARS,
+} from './config.js';
+
+export type {
+  SkillsConfig,
+  RegistryConfig,
+  PlatformConfig,
+  TelemetryConfig,
+  PrivateRepoConfig,
+} from './config.js';
